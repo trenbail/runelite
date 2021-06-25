@@ -1141,6 +1141,16 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 
 			glDpiAwareViewport(renderWidthOff, renderCanvasHeight - renderViewportHeight - renderHeightOff, renderViewportWidth, renderViewportHeight);
 
+			if (OSType.getOSType() == OSType.MacOS && glDrawable instanceof GLFBODrawable)
+			{
+				// GLDrawables created with createGLDrawable() do not have a resize listener
+				// I don't know why this works with Windows/Linux, but on OSX
+				// it prevents JOGL from resizing its FBOs and underlying GL textures. So,
+				// we manually trigger a resize here.
+				GLFBODrawable glfboDrawable = (GLFBODrawable) glDrawable;
+				glfboDrawable.resetSize(gl);
+			}
+
 			gl.glUseProgram(glProgram);
 
 			final int drawDistance = getDrawDistance();
